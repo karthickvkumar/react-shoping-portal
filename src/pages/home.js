@@ -58,7 +58,7 @@ class HomePage extends Component {
       <div>
         <HeaderComponent></HeaderComponent>
         <ImageCarosule images={this.state.images}></ImageCarosule>
-        <ProductsComponent products={this.state.products}></ProductsComponent>
+        <ProductsComponent products={this.state.products} message={"Latest Products"}></ProductsComponent>
         <ProductInfoComponent></ProductInfoComponent>
         <div class="product-widget-area">
           <div class="zigzag-bottom"></div>

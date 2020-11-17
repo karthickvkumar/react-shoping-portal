@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
+import * as productAction from '../redux/actions/product-action';
 
 import HeaderComponent from '../components/header';
 import FooterComponent from '../components/footer';
@@ -14,6 +18,7 @@ class ShopPage extends Component {
   }
 
   componentDidMount() {
+    //this.props.actions.addToCart({name: 'Iphone 12'})
     const url = "https://shop143.herokuapp.com/telebuy/api/products";
     axios.get(url)
       .then((response) => {
@@ -38,7 +43,8 @@ class ShopPage extends Component {
                 <div class="product-bit-title text-center">
                   <h2>Smartphones</h2>
                 </div>
-                <ProductsComponent products={this.state.allProduct}></ProductsComponent>
+                <ProductsComponent products={this.state.allProduct} 
+                message={''}></ProductsComponent>
               </div>
             </div>
           </div>
@@ -50,4 +56,17 @@ class ShopPage extends Component {
   }
 }
 
-export default ShopPage;
+function mapStateToProps(state){
+  return{
+
+  }
+}
+
+function mapDispatchToProps(dispatch){
+  return{
+    actions: bindActionCreators(productAction, dispatch)
+  }
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(ShopPage);
