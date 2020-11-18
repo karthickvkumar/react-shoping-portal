@@ -8,6 +8,8 @@ import * as productAction from '../redux/actions/product-action';
 class ProductsComponent extends Component {
   
   addToCart(value){
+    value.count = 1;
+    value.price = value.discount_price;
     this.props.actions.addToCart(value)
   }
 

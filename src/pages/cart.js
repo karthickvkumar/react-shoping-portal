@@ -1,10 +1,88 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
+import * as productAction from '../redux/actions/product-action';
 import HeaderComponent from '../components/header';
 import FooterComponent from '../components/footer';
 
 class CartPage extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      products : this.props.products
+    }
+  }
+
+  changeQuantity(mode, product, index){
+    if(mode == 'plus'){
+      product.count = product.count + 1;
+    }
+    else{
+      if(product.count >= 1 ){
+        product.count = product.count - 1;
+      }
+    }
+
+    let priceStr = product.price.split('$')[1]; 
+    let price = parseInt(priceStr);
+    product.discount_price = "$" + price * product.count
+
+    this.state.products[index] = product;
+    this.setState({
+      products: this.state.products
+    })
+  }
+
+
   render() {
+    let checkOutProduct = this.state.products.map((value, index) => {
+      return (
+        <tr class="cart_item">
+          <td class="product-remove">
+            <a title="Remove this item" class="remove" href="#">×</a>
+          </td>
+
+          <td class="product-thumbnail">
+            <a href="single-product.html"><img width="145" height="145"
+              alt="poster_1_up" class="shop_thumbnail"
+              src={value.image} /></a>
+          </td>
+
+          <td class="product-name">
+            <a href="single-product.html">{value.name}</a>
+          </td>
+
+          <td class="product-price">
+      <span class="amount">{ value.discount_price}</span>
+          </td>
+
+          <td class="product-quantity">
+            <div class="quantity buttons_added">
+              <input type="button" class="minus" value="-" onClick={() => this.changeQuantity('minus',value,index)}/>
+              <input type="number" size="4" class="input-text qty text"
+                title="Qty" min="0" step="1" value={value.count} />
+              <input type="button" class="plus" value="+" onClick={() => this.changeQuantity('plus', value,index)} />
+            </div>
+          </td>
+
+          <td class="product-subtotal">
+            <span class="amount">{value.discount_price}</span>
+          </td>
+        </tr>
+      )
+    });
+
+    let total = 0;
+    if(this.state.products.length > 0){
+      total = this.state.products.map((value, index) => {
+        let priceStr = value.discount_price.split('$')[1]; 
+        let price = parseInt(priceStr);
+        return price
+      }).reduce((previousValue, currentValue, index) => {
+        return previousValue + currentValue
+      })
+    }
     return (
       <div>
         <HeaderComponent></HeaderComponent>
@@ -41,6 +119,7 @@ class CartPage extends Component {
                           </tr>
                         </thead>
                         <tbody>
+                          {checkOutProduct}
                           {/* <tr class="cart_item">
                             <td class="product-remove">
                               <a title="Remove this item" class="remove" href="#">×</a>
@@ -105,7 +184,7 @@ class CartPage extends Component {
                           <tbody>
                             <tr class="cart-subtotal">
                               <th>Cart Subtotal</th>
-                              <td><span class="amount">£15.00</span></td>
+                        <td><span class="amount">$ {total}</span></td>
                             </tr>
 
                             <tr class="shipping">
@@ -115,7 +194,7 @@ class CartPage extends Component {
 
                             <tr class="order-total">
                               <th>Order Total</th>
-                              <td><strong><span class="amount">£15.00</span></strong> </td>
+                        <td><strong><span class="amount">$ {total}</span></strong> </td>
                             </tr>
                           </tbody>
                         </table>
@@ -138,4 +217,17 @@ class CartPage extends Component {
   }
 }
 
-export default CartPage;
+function mapStateToProps(state) {
+  return {
+    products: state.productReducer.productList
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators(productAction, dispatch)
+  }
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(CartPage);
